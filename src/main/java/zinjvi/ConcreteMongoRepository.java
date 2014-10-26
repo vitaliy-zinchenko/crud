@@ -24,10 +24,7 @@ public class ConcreteMongoRepository extends BaseMongoRepository<Bean, String> {
     @Override
     protected DBObject convertToDBObject(Bean entity) {
         DBObject dbObject = new BasicDBObject();
-        if (entity.getId() != null) {
-            ObjectId objectId = stringIdToObjectId(entity.getId());
-            dbObject.put(ID_KEY, objectId);
-        }
+        fillId(dbObject, entity.getId());
         dbObject.put(NAME_KEY, entity.getName());
         return dbObject;
     }

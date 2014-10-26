@@ -3,7 +3,7 @@ package zinjvi.bean;
 /**
  * Created by zinchenko on 24.10.14.
  */
-public class BaseBean<I> implements IdShower<I> {
+public class BaseBean<I> {
 
     protected I id;
 

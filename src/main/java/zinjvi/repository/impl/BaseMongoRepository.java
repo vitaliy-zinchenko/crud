@@ -3,14 +3,13 @@ package zinjvi.repository.impl;
 import com.mongodb.*;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import zinjvi.bean.IdShower;
 import zinjvi.repository.Repository;
 
 import javax.print.DocFlavor;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class BaseMongoRepository<T extends IdShower, I>  implements Repository<T, I> {
+public abstract class BaseMongoRepository<T, I>  implements Repository<T, I> {
     
     protected static final String ID_KEY = "_id";
 
@@ -23,12 +22,13 @@ public abstract class BaseMongoRepository<T extends IdShower, I>  implements Rep
 
     protected abstract String getCollectionName();
 
+    //TODO | remove
     protected String objectIdToString(ObjectId objectId) {
         return objectId.toString();
     }
 
-    protected ObjectId stringIdToObjectId(String stringId) {
-        return new ObjectId(stringId);
+    protected ObjectId stringIdToObjectId(Object id) {
+        return new ObjectId(id.toString());
     }
 
     protected DBCollection getCollection() {
@@ -42,6 +42,13 @@ public abstract class BaseMongoRepository<T extends IdShower, I>  implements Rep
     protected DBObject getIdDBObject(I id) {
         ObjectId objectId = new ObjectId(String.valueOf(id));
         return new BasicDBObject(ID_KEY, objectId);
+    }
+
+    protected void fillId(DBObject dbObject, Object id) {
+        if (id != null) {
+            ObjectId objectId = stringIdToObjectId(id);
+            dbObject.put(ID_KEY, objectId);
+        }
     }
 
     protected List<T> cursorToList(DBCursor cursor) {

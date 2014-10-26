@@ -15,7 +15,7 @@ public interface Service<T, I> {
 
     void update(T entity);
 
-    T merge(T entity);
+//    T merge(T entity);
 
     void deleteById(I id);
 
