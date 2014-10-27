@@ -5,7 +5,6 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import zinjvi.repository.Repository;
 
-import javax.print.DocFlavor;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,9 +15,17 @@ public abstract class BaseMongoRepository<T, I>  implements Repository<T, I> {
     @Autowired
     protected DB db;
 
-    protected abstract T convertToEntity(DBObject dbObject);
-    
-    protected abstract DBObject convertToDBObject(T entity);
+    protected abstract DBObjectToEntityBuilder getDBObjectToEntityBuilder(DBObject dbObject);
+
+    protected abstract EntityToDBObjectBuilder getEntityToDBObjectBuilder(T entity);
+
+    protected T convertToEntity(DBObject dbObject) {
+        return (T) getDBObjectToEntityBuilder(dbObject).build();
+    }
+
+    protected DBObject convertToDBObject(T entity) {
+        return getEntityToDBObjectBuilder(entity).build();
+    }
 
     protected abstract String getCollectionName();
 
@@ -61,6 +68,62 @@ public abstract class BaseMongoRepository<T, I>  implements Repository<T, I> {
             cursor.close();
         }
         return list;
+    }
+
+    protected abstract class EntityToDBObjectBuilder<T> {
+
+        protected T entity;
+
+        protected DBObject postDbObject;
+
+        public EntityToDBObjectBuilder(T entity) {
+            this.entity = entity;
+        }
+
+        public abstract DBObject build();
+
+    }
+
+    protected DBObjectBuilder creteDBObjectBuilder() {
+        return new DBObjectBuilder();
+    }
+
+    protected abstract class DBObjectToEntityBuilder<T> {
+
+        protected T entity;
+
+        protected DBObject dbObject;
+
+        public DBObjectToEntityBuilder(DBObject dbObject) {
+            this.dbObject = dbObject;
+        }
+
+        public abstract T build();
+
+    }
+
+    public class DBObjectBuilder {
+
+        private DBObject dbObject = new BasicDBObject();
+
+        public DBObject build() {
+            return dbObject;
+        }
+
+        public void buildTo(List list) {
+            list.add(build());
+        }
+
+        public DBObjectBuilder put(String key, Object value) {
+            dbObject.put(key, value);
+            return this;
+        }
+
+        public DBObjectBuilder putId(Object id) {
+            fillId(dbObject, id);
+            return this;
+        }
+
     }
 
 	public List<T> findAll() {
