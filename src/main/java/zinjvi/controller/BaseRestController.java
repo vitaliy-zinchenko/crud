@@ -32,8 +32,8 @@ public abstract class BaseRestController<T, I> {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public @ResponseBody
-    void get(@PathVariable I id) {
-        service.find(id);
+    T get(@PathVariable I id) {
+        return service.find(id);
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -43,7 +43,7 @@ public abstract class BaseRestController<T, I> {
         return entity;
     }
 
-    @RequestMapping(method = RequestMethod.PUT)
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public @ResponseBody
     T update(@RequestBody T entity) {
         service.update(entity);
