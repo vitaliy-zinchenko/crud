@@ -1,20 +1,35 @@
 package zinjvi.repository.impl;
 
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import zinjvi.repository.Repository;
 
+import javax.transaction.Transactional;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
 /**
  * Created by zinchenko on 22.10.14.
  */
-public class BaseHibernateRepository<T, I> extends HibernateRepository implements Repository<T, I> {
+public class BaseHibernateRepository<T, I> implements Repository<T, I> {
 
     private Class<?> eClass;
 
-    public BaseHibernateRepository() {
+    private SessionFactory sessionFactory;
+
+    protected Criteria createCriteria(Class clazz) {
+        return getSession().createCriteria(clazz);
+    }
+
+    protected Session getSession() {
+        return sessionFactory.getCurrentSession();
+    }
+
+    public BaseHibernateRepository(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
         this.eClass = (Class<T>) ((ParameterizedType) getClass()
                 .getGenericSuperclass()).getActualTypeArguments()[0];
     }
